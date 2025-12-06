@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Orders - Motion Admin{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="container">
+        <div class="admin-header">
+            <div>
+                <h1>Order Management</h1>
+                <p>View and manage all customer orders</p>
+            </div>
+            <div class="admin-nav">
+                <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link">Dashboard</a>
+                <a href="{{ url_for('admin_orders') }}" class="admin-nav-link active">Orders</a>
+                <a href="{{ url_for('admin_users') }}" class="admin-nav-link">Users</a>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="filters-bar">
+            <span class="filter-label">Filter by Status:</span>
+            <a href="{{ url_for('admin_orders') }}" class="filter-btn {% if not current_status %}active{% endif %}">All</a>
+            <a href="{{ url_for('admin_orders', status='New') }}" class="filter-btn {% if current_status == 'New' %}active{% endif %}">New</a>
+            <a href="{{ url_for('admin_orders', status='In Progress') }}" class="filter-btn {% if current_status == 'In Progress' %}active{% endif %}">In Progress</a>
+            <a href="{{ url_for('admin_orders', status='Completed') }}" class="filter-btn {% if current_status == 'Completed' %}active{% endif %}">Completed</a>
+            <a href="{{ url_for('admin_orders', status='Cancelled') }}" class="filter-btn {% if current_status == 'Cancelled' %}active{% endif %}">Cancelled</a>
+        </div>
+        
+        <!-- Orders Table -->
+        <div class="dashboard-card">
+            {% if orders %}
+            <div class="orders-table-wrapper">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Email</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>{{ order.customer_name }}</td>
+                            <td><a href="mailto:{{ order.customer_email }}">{{ order.customer_email }}</a></td>
+                            <td>{{ order.service_type|title }}</td>
+                            <td>{{ order.date_created.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status|lower|replace(' ', '-') }}">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn btn-small">
+                                    View / Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No Orders Found</h3>
+                <p>{% if current_status %}No orders with status "{{ current_status }}".{% else %}No orders have been placed yet.{% endif %}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-section {
+        padding: 100px 20px 60px;
+        background: #f0f2f5;
+    }
+    
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .admin-header h1 {
+        margin-bottom: 5px;
+    }
+    
+    .admin-header p {
+        color: var(--text-light);
+    }
+    
+    .admin-nav {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .admin-nav-link {
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--text-color);
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    .admin-nav-link:hover,
+    .admin-nav-link.active {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+    
+    .filters-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-label {
+        font-weight: 500;
+        color: var(--text-light);
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: var(--white);
+        color: var(--text-color);
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+    
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--secondary-color);
+        color: var(--white);
+    }
+    
+    .dashboard-card {
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    
+    .orders-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .admin-table th {
+        background: var(--primary-color);
+        color: var(--white);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .admin-table tbody tr:hover {
+        background: #f9f9f9;
+    }
+    
+    .admin-table a {
+        color: var(--secondary-color);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-new { background: #e3f2fd; color: #1976d2; }
+    .status-in-progress { background: #fff3e0; color: #f57c00; }
+    .status-completed { background: #e8f5e9; color: #388e3c; }
+    .status-cancelled { background: #ffebee; color: #d32f2f; }
+    
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        background: var(--primary-color);
+        color: var(--white);
+        border-radius: 5px;
+    }
+    
+    .btn-small:hover {
+        background: #0d2240;
+        color: var(--white);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+    
+    .empty-state h3 {
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: var(--text-light);
+    }
+    
+    @media (max-width: 768px) {
+        .admin-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+

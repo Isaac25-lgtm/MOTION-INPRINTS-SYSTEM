@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Motion{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h1>My Orders</h1>
+                <p>Welcome back, {{ current_user.name }}!</p>
+            </div>
+            <a href="{{ url_for('home') }}#contact" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Order
+            </a>
+        </div>
+        
+        {% if orders %}
+            <div class="orders-table-wrapper">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>{{ order.service_type|title }}</td>
+                            <td>{{ order.date_created.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status|lower|replace(' ', '-') }}">
+                                    {{ order.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('view_order', order_id=order.id) }}" class="btn-view">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No Orders Yet</h3>
+                <p>You haven't placed any orders yet. Get started by requesting a quote!</p>
+                <a href="{{ url_for('home') }}#contact" class="btn btn-primary">Request a Quote</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-section {
+        padding: 120px 20px 60px;
+        background: var(--light-bg);
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .dashboard-header h1 {
+        margin-bottom: 5px;
+    }
+    
+    .dashboard-header p {
+        color: var(--text-light);
+    }
+    
+    .orders-table-wrapper {
+        background: var(--white);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+        overflow-x: auto;
+    }
+    
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .orders-table th {
+        background: var(--primary-color);
+        color: var(--white);
+        font-weight: 600;
+    }
+    
+    .orders-table th:first-child {
+        border-radius: 10px 0 0 0;
+    }
+    
+    .orders-table th:last-child {
+        border-radius: 0 10px 0 0;
+    }
+    
+    .orders-table tbody tr:hover {
+        background: #f9f9f9;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-new {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    
+    .status-in-progress {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .status-completed {
+        background: #e8f5e9;
+        color: #388e3c;
+    }
+    
+    .status-cancelled {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+    
+    .btn-view {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+    
+    .btn-view:hover {
+        text-decoration: underline;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: var(--white);
+        border-radius: 10px;
+        box-shadow: var(--shadow);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: var(--text-light);
+        margin-bottom: 25px;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
