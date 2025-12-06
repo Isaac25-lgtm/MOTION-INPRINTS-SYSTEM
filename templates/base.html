@@ -9,7 +9,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,8 +33,20 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <a href="{{ url_for('home') }}" class="logo">
-                <i class="fas fa-layer-group"></i> Motion<span>.</span>
+            <a href="{{ url_for('home') }}" class="logo" aria-label="Motion - Home">
+                <span class="logo-text">Motion</span>
+                <svg class="logo-icon" width="32" height="38" viewBox="0 0 120 140" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="navMotionGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#E3F2FD" />
+                            <stop offset="50%" stop-color="#64B5F6" />
+                            <stop offset="100%" stop-color="#1976D2" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="85" cy="14" r="12" fill="#2196F3" />
+                    <rect x="10" y="40" rx="20" ry="20" width="100" height="100" fill="url(#navMotionGrad)" />
+                    <path d="M 75 58 Q 70 75, 62 95 Q 58 105, 55 112 Q 52 120, 58 124 Q 65 128, 78 118 Q 88 110, 98 98" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
             </a>
             <div class="mobile-menu-btn">
                 <i class="fas fa-bars"></i>
@@ -83,7 +95,22 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <h3>Motion<span>.</span></h3>
+                <div class="footer-logo">
+                    <span class="footer-logo-text">Motion</span>
+                    <svg class="footer-logo-icon" width="40" height="46" viewBox="0 0 120 140" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="footerMotionGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#E3F2FD" />
+                                <stop offset="50%" stop-color="#64B5F6" />
+                                <stop offset="100%" stop-color="#1976D2" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="85" cy="14" r="12" fill="#2196F3" />
+                        <rect x="10" y="40" rx="20" ry="20" width="100" height="100" fill="url(#footerMotionGrad)" />
+                        <path d="M 75 58 Q 70 75, 62 95 Q 58 105, 55 112 Q 52 120, 58 124 Q 65 128, 78 118 Q 88 110, 98 98" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <p class="footer-tagline">DESIGN<span class="dot">.</span>PRINT<span class="dot">.</span>BRAND</p>
                 <p>Premier Design, Printing & Branding Studio.</p>
                 <div class="footer-links">
                     <a href="#">Privacy Policy</a>
@@ -98,6 +125,12 @@
 
     <!-- Custom JS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/256782656721?text=Hello%20Motion,%20I%20would%20like%20to%20inquire%20about%20your%20services." 
+       class="floating-whatsapp" target="_blank" aria-label="Chat on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
     
     <!-- Flash message close functionality -->
     <script>

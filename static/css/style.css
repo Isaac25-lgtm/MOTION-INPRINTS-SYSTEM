@@ -163,17 +163,22 @@ img {
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: 700;
-    font-family: 'Poppins', sans-serif;
-    color: var(--primary-color);
     display: flex;
     align-items: center;
     gap: 10px;
+    text-decoration: none;
 }
 
-.logo span {
-    color: var(--secondary-color);
+.logo-icon {
+    flex-shrink: 0;
+}
+
+.logo-text {
+    font-family: 'Nunito', 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #2196F3;
+    letter-spacing: -0.5px;
 }
 
 .nav-links {
@@ -276,54 +281,49 @@ img {
 }
 
 .portfolio-item {
-    position: relative;
+    background: var(--white);
     border-radius: 10px;
     overflow: hidden;
-    height: 250px;
     box-shadow: var(--shadow);
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-.portfolio-item img {
+.portfolio-img-wrapper {
+    height: 220px;
+    overflow: hidden;
+}
+
+.portfolio-img-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: var(--transition);
 }
 
-.portfolio-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 25, 47, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: var(--transition);
+.portfolio-item:hover .portfolio-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.portfolio-content {
     padding: 20px;
     text-align: center;
+    background: var(--white);
+    flex-grow: 1;
 }
 
-.portfolio-item:hover .portfolio-overlay {
-    opacity: 1;
+.portfolio-content h3 {
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    color: var(--primary-color);
 }
 
-.portfolio-item:hover img {
-    transform: scale(1.1);
-}
-
-.portfolio-overlay h3 {
-    color: var(--white);
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-}
-
-.portfolio-overlay p {
-    color: #cccccc;
+.portfolio-content p {
+    color: var(--text-light);
     font-size: 0.9rem;
+    margin: 0;
 }
 
 /* About Section */
@@ -552,6 +552,34 @@ footer {
     margin-bottom: 40px;
 }
 
+.footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.footer-logo-text {
+    font-family: 'Nunito', 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2196F3;
+}
+
+.footer-tagline {
+    font-family: 'Nunito', 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #cccccc;
+    margin-top: 8px;
+}
+
+.footer-tagline .dot {
+    color: var(--secondary-color);
+    margin: 0 4px;
+}
+
 .footer-links {
     margin: 20px 0;
 }
@@ -725,5 +753,42 @@ footer {
 
 .nav-highlight:hover {
     background: #e68a00;
+}
+
+/* Floating WhatsApp Button */
+.floating-whatsapp {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #25D366;
+    color: var(--white);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.floating-whatsapp:hover {
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+    background: #20bd5a;
+    color: var(--white);
+}
+
+@media (max-width: 768px) {
+    .floating-whatsapp {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 28px;
+    }
 }
 

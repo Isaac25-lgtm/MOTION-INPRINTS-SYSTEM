@@ -73,6 +73,7 @@ class Order(db.Model):
     # Contact info (for guest orders or additional contact)
     guest_name = db.Column(db.String(100))
     guest_email = db.Column(db.String(120))
+    guest_phone = db.Column(db.String(20))
     
     # Order details
     service_type = db.Column(db.String(50), nullable=False)  # e.g., 'design', 'printing', 'branding', 'signage', 'general'
@@ -289,6 +290,7 @@ def register_routes(app):
         """Handle order/contact form submission"""
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
+        phone = request.form.get('phone', '').strip()
         service_type = request.form.get('service', 'general')
         details = request.form.get('message', '').strip()
         
@@ -300,12 +302,14 @@ def register_routes(app):
         # Create order
         order = Order(
             service_type=service_type,
-            details=details
+            details=details,
+            guest_phone=phone
         )
         
         # Link to user if logged in, otherwise store guest info
         if current_user.is_authenticated:
             order.user_id = current_user.id
+            # If user has no phone saved, we might want to save it here too, but for now just attach to order
         else:
             order.guest_name = name
             order.guest_email = email
@@ -315,7 +319,7 @@ def register_routes(app):
         
         # Send email notification (non-blocking, with error handling)
         try:
-            send_order_notification(order, name, email)
+            send_order_notification(order, name, email, phone)
         except Exception as e:
             app.logger.error(f'Failed to send order notification: {e}')
         
@@ -450,7 +454,7 @@ def register_routes(app):
 # HELPER FUNCTIONS
 # =============================================================================
 
-def send_order_notification(order, customer_name, customer_email):
+def send_order_notification(order, customer_name, customer_email, customer_phone=None):
     """Send email notification for new order"""
     from flask import current_app
     
@@ -469,6 +473,7 @@ New order received on Motion website.
 Order ID: {order.id}
 Customer: {customer_name}
 Email: {customer_email}
+Phone: {customer_phone or 'N/A'}
 Service: {order.service_type}
 
 Details:
