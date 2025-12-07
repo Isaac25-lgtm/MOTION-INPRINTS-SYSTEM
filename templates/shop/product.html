@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Motion Shop{% endblock %}
+
+{% block content %}
+<section class="product-hero">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('shop') }}">Shop</a>
+            <span>/</span>
+            <a href="{{ url_for('shop_category', slug=product.category.slug) }}">{{ product.category.name }}</a>
+            <span>/</span>
+            <span>{{ product.name }}</span>
+        </nav>
+    </div>
+</section>
+
+<section class="product-detail section">
+    <div class="container">
+        <div class="product-layout">
+            <div class="product-gallery">
+                {% if product.image %}
+                <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}">
+                {% else %}
+                <div class="product-placeholder-large">
+                    <i class="{{ product.category.icon }}"></i>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="product-form-section">
+                <h1>{{ product.name }}</h1>
+                <p class="product-description">{{ product.description }}</p>
+                
+                <div class="quote-info-box">
+                    <div class="quote-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="quote-text">
+                        <h4>Request a Quote</h4>
+                        <p>Fill out your order details below. We'll send you a personalized quote via <strong>Email</strong> and <strong>WhatsApp</strong> within 24 hours.</p>
+                    </div>
+                </div>
+                
+                <div class="min-order-notice">
+                    <i class="fas fa-info-circle"></i> Minimum order: {{ product.min_quantity }} pieces
+                </div>
+                
+                {% if current_user.is_authenticated %}
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" enctype="multipart/form-data" class="add-to-cart-form">
+                    
+                    <div class="form-section-title">
+                        <i class="fas fa-user"></i> Your Contact Details
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact_email">Email *</label>
+                            <input type="email" id="contact_email" name="contact_email" class="form-control" 
+                                   value="{{ current_user.email }}" required placeholder="your@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="contact_phone">WhatsApp / Phone *</label>
+                            <input type="tel" id="contact_phone" name="contact_phone" class="form-control" 
+                                   value="{{ current_user.phone or '' }}" required placeholder="0700000000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section-title">
+                        <i class="fas fa-shopping-bag"></i> Order Details
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">Quantity *</label>
+                            <input type="number" id="quantity" name="quantity" class="form-control" 
+                                   value="{{ product.min_quantity }}" min="{{ product.min_quantity }}" required>
+                        </div>
+                    </div>
+                    
+                    {% if product.get_options('size') %}
+                    <div class="form-group">
+                        <label for="size">Size *</label>
+                        <select id="size" name="size" class="form-control" required>
+                            <option value="">Select Size</option>
+                            {% for opt in product.get_options('size') %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <div id="custom-size-group" class="form-group" style="display: none;">
+                        <label for="custom_size">Custom Size (e.g., 100x150mm)</label>
+                        <input type="text" id="custom_size" name="custom_size" class="form-control" placeholder="Width x Height">
+                    </div>
+                    
+                    {% if product.get_options('material') %}
+                    <div class="form-group">
+                        <label for="material">Material *</label>
+                        <select id="material" name="material" class="form-control" required>
+                            <option value="">Select Material</option>
+                            {% for opt in product.get_options('material') %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    {% if product.get_options('color') %}
+                    <div class="form-group">
+                        <label for="color">Color Option</label>
+                        <select id="color" name="color" class="form-control">
+                            <option value="">Select Color</option>
+                            {% for opt in product.get_options('color') %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    {% if product.get_options('finishing') %}
+                    <div class="form-group">
+                        <label for="finishing">Finishing</label>
+                        <select id="finishing" name="finishing" class="form-control">
+                            <option value="">Select Finishing</option>
+                            {% for opt in product.get_options('finishing') %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-section-title">
+                        <i class="fas fa-upload"></i> Upload Your Design (Optional)
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="design_file" name="design_file" class="form-control-file"
+                                   accept=".png,.jpg,.jpeg,.gif,.pdf,.ai,.psd,.eps,.svg,.doc,.docx,.zip" multiple>
+                            <div class="file-upload-info">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Upload your design, reference image, or document</p>
+                                <span>PNG, JPG, PDF, Word, AI, PSD (Max 50MB)</span>
+                            </div>
+                        </div>
+                        <div id="file-name" class="file-name"></div>
+                        <p class="upload-hint">Upload exactly how you want your product to look - images, logos, or document with specifications</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="design_notes">Additional Instructions / Description</label>
+                        <textarea id="design_notes" name="design_notes" class="form-control" rows="4" 
+                                  placeholder="Describe your requirements in detail: colors, text, layout preferences, or any specific instructions..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <i class="fas fa-paper-plane"></i> Submit Order & Get Quote
+                    </button>
+                    
+                    <p class="quote-note">
+                        <i class="fas fa-clock"></i> You'll receive a personalized quote within 24 hours via email and WhatsApp
+                    </p>
+                </form>
+                {% else %}
+                <div class="login-prompt">
+                    <p>Please log in to add items to your cart and request a quote.</p>
+                    <a href="{{ url_for('login') }}?next={{ request.url }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Log In
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline">
+                        Create Account
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-hero {
+        background: var(--primary-color);
+        padding: 100px 0 30px;
+    }
+    
+    .breadcrumb {
+        font-size: 0.95rem;
+    }
+    
+    .breadcrumb a {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .breadcrumb a:hover {
+        color: white;
+    }
+    
+    .breadcrumb span {
+        margin: 0 10px;
+        color: rgba(255,255,255,0.5);
+    }
+    
+    .product-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .product-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .product-gallery {
+        background: var(--light-bg);
+        border-radius: 15px;
+        overflow: hidden;
+        aspect-ratio: 1;
+    }
+    
+    .product-gallery img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .product-placeholder-large {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8rem;
+        color: #ddd;
+    }
+    
+    .product-form-section h1 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    .product-description {
+        color: var(--text-light);
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    
+    .quote-info-box {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border: 2px solid #0ea5e9;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .quote-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .quote-text h4 {
+        color: #0c4a6e;
+        margin-bottom: 8px;
+        font-size: 1.2rem;
+    }
+    
+    .quote-text p {
+        color: #0369a1;
+        font-size: 0.95rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    .min-order-notice {
+        background: var(--light-bg);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        color: var(--text-light);
+    }
+    
+    .min-order-notice i {
+        color: var(--secondary-color);
+        margin-right: 8px;
+    }
+    
+    .form-section-title {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 25px 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--light-bg);
+        font-size: 1rem;
+    }
+    
+    .form-section-title i {
+        color: var(--secondary-color);
+        margin-right: 10px;
+    }
+    
+    .upload-hint {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 10px;
+        font-style: italic;
+    }
+    
+    .quote-note {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+    
+    .quote-note i {
+        color: var(--secondary-color);
+        margin-right: 5px;
+    }
+    
+    .add-to-cart-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        border: 2px dashed var(--border-color);
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-wrapper:hover {
+        border-color: var(--secondary-color);
+        background: rgba(255, 159, 28, 0.05);
+    }
+    
+    .file-upload-wrapper input[type="file"] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .file-upload-info i {
+        font-size: 2.5rem;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+    
+    .file-upload-info p {
+        margin: 0;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .file-upload-info span {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .file-name {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+    
+    .btn-lg {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+    }
+    
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+    
+    .login-prompt {
+        background: var(--light-bg);
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .login-prompt p {
+        margin-bottom: 20px;
+        color: var(--text-light);
+    }
+    
+    .login-prompt .btn {
+        margin: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show custom size field when "Custom" is selected
+    document.getElementById('size')?.addEventListener('change', function() {
+        const customGroup = document.getElementById('custom-size-group');
+        if (this.value.toLowerCase() === 'custom') {
+            customGroup.style.display = 'block';
+        } else {
+            customGroup.style.display = 'none';
+        }
+    });
+    
+    // Show selected file name
+    document.getElementById('design_file')?.addEventListener('change', function() {
+        const fileName = document.getElementById('file-name');
+        if (this.files.length > 0) {
+            fileName.innerHTML = '<i class="fas fa-check-circle"></i> ' + this.files[0].name;
+        } else {
+            fileName.innerHTML = '';
+        }
+    });
+</script>
+{% endblock %}
+

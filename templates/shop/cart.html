@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Motion{% endblock %}
+
+{% block content %}
+<section class="cart-hero">
+    <div class="container">
+        <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+        <p>Review your items and request a quote</p>
+    </div>
+</section>
+
+<section class="cart-section section">
+    <div class="container">
+        {% if cart_items %}
+        <div class="cart-layout">
+            <div class="cart-items">
+                {% for item in cart_items %}
+                <div class="cart-item">
+                    <div class="item-image">
+                        {% if item.product.image %}
+                        <img src="{{ url_for('static', filename='images/' + item.product.image) }}" alt="{{ item.product.name }}">
+                        {% else %}
+                        <div class="item-placeholder">
+                            <i class="{{ item.product.category.icon }}"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <h3>{{ item.product.name }}</h3>
+                        <p class="item-category">{{ item.product.category.name }}</p>
+                        
+                        <div class="item-options">
+                            {% if item.size %}<span><strong>Size:</strong> {{ item.size }}</span>{% endif %}
+                            {% if item.custom_size %}<span><strong>Custom:</strong> {{ item.custom_size }}</span>{% endif %}
+                            {% if item.material %}<span><strong>Material:</strong> {{ item.material }}</span>{% endif %}
+                            {% if item.color %}<span><strong>Color:</strong> {{ item.color }}</span>{% endif %}
+                            {% if item.finishing %}<span><strong>Finishing:</strong> {{ item.finishing }}</span>{% endif %}
+                        </div>
+                        
+                        {% if item.design_file %}
+                        <div class="design-file">
+                            <i class="fas fa-file-image"></i>
+                            <a href="{{ url_for('uploaded_file', filename=item.design_file) }}" target="_blank">View Design File</a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if item.design_notes %}
+                        <div class="design-notes">
+                            <strong>Notes:</strong> {{ item.design_notes[:100] }}{% if item.design_notes|length > 100 %}...{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="item-quantity">
+                        <form action="{{ url_for('update_cart_item', item_id=item.id) }}" method="POST" class="qty-form">
+                            <label>Qty:</label>
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="{{ item.product.min_quantity }}" 
+                                   onchange="this.form.submit()">
+                        </form>
+                    </div>
+                    
+                    <div class="item-actions">
+                        <form action="{{ url_for('remove_from_cart', item_id=item.id) }}" method="POST">
+                            <button type="submit" class="btn-remove" title="Remove item">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="cart-summary">
+                <h3>Request Quote</h3>
+                <div class="summary-info">
+                    <p><strong>{{ cart_items|length }}</strong> item(s) in cart</p>
+                    
+                    {% if current_user.discount_percent > 0 %}
+                    <div class="loyalty-badge">
+                        <i class="fas fa-star"></i>
+                        <span>{{ current_user.customer_tier }} Member - {{ current_user.discount_percent }}% Discount</span>
+                    </div>
+                    {% endif %}
+                    
+                    <p class="quote-note">
+                        <i class="fas fa-info-circle"></i>
+                        Final pricing will be provided after we review your requirements. 
+                        Prices depend on quantity, materials, and complexity.
+                    </p>
+                </div>
+                
+                <form action="{{ url_for('request_quote') }}" method="POST" class="quote-form">
+                    <div class="form-group">
+                        <label for="notes">Additional Notes (Optional)</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="3" 
+                                  placeholder="Any additional requirements or questions..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <i class="fas fa-paper-plane"></i> Request Quote
+                    </button>
+                </form>
+                
+                <a href="{{ url_for('shop') }}" class="continue-shopping">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-cart">
+            <i class="fas fa-shopping-cart"></i>
+            <h2>Your cart is empty</h2>
+            <p>Add some products to get started</p>
+            <a href="{{ url_for('shop') }}" class="btn btn-primary">Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-hero {
+        background: linear-gradient(135deg, var(--primary-color), #1a365d);
+        color: white;
+        padding: 120px 0 60px;
+        text-align: center;
+    }
+    
+    .cart-hero h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .cart-hero h1 i {
+        margin-right: 15px;
+        color: var(--secondary-color);
+    }
+    
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 40px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .cart-item {
+        display: grid;
+        grid-template-columns: 100px 1fr auto auto;
+        gap: 20px;
+        align-items: start;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .cart-item {
+            grid-template-columns: 80px 1fr;
+            gap: 15px;
+        }
+        
+        .item-quantity, .item-actions {
+            grid-column: 2;
+        }
+    }
+    
+    .item-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--light-bg);
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-placeholder {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #ddd;
+    }
+    
+    .item-details h3 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .item-category {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-bottom: 10px;
+    }
+    
+    .item-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .item-options span {
+        background: var(--light-bg);
+        padding: 3px 10px;
+        border-radius: 5px;
+    }
+    
+    .design-file {
+        margin-top: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .design-file a {
+        color: var(--secondary-color);
+    }
+    
+    .design-notes {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .item-quantity {
+        text-align: center;
+    }
+    
+    .qty-form label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-light);
+        margin-bottom: 5px;
+    }
+    
+    .qty-form input {
+        width: 70px;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-remove:hover {
+        color: #a71d2a;
+        transform: scale(1.1);
+    }
+    
+    .cart-summary {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .cart-summary h3 {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--light-bg);
+    }
+    
+    .summary-info {
+        margin-bottom: 25px;
+    }
+    
+    .loyalty-badge {
+        background: linear-gradient(135deg, var(--secondary-color), #ffb347);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .quote-note {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        background: var(--light-bg);
+        padding: 15px;
+        border-radius: 8px;
+        line-height: 1.5;
+    }
+    
+    .quote-note i {
+        color: var(--secondary-color);
+        margin-right: 5px;
+    }
+    
+    .continue-shopping {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: var(--text-light);
+    }
+    
+    .continue-shopping:hover {
+        color: var(--secondary-color);
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .empty-cart i {
+        font-size: 5rem;
+        color: #ddd;
+        margin-bottom: 25px;
+    }
+    
+    .empty-cart h2 {
+        margin-bottom: 10px;
+    }
+    
+    .empty-cart p {
+        color: var(--text-light);
+        margin-bottom: 25px;
+    }
+</style>
+{% endblock %}
+

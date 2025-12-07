@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Motion Shop{% endblock %}
+
+{% block content %}
+<section class="category-hero">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('shop') }}">Shop</a>
+            <span>/</span>
+            <span>{{ category.name }}</span>
+        </nav>
+        <h1><i class="{{ category.icon }}"></i> {{ category.name }}</h1>
+        <p>{{ category.description }}</p>
+    </div>
+</section>
+
+<section class="products-section section">
+    <div class="container">
+        {% if products %}
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <div class="product-image">
+                    {% if product.image %}
+                    <img src="{{ url_for('static', filename='images/' + product.image) }}" alt="{{ product.name }}">
+                    {% else %}
+                    <div class="product-placeholder">
+                        <i class="{{ category.icon }}"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p class="product-desc">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                    <div class="product-meta">
+                        <span class="product-min"><i class="fas fa-boxes"></i> Min: {{ product.min_quantity }} pcs</span>
+                        <span class="quote-badge"><i class="fas fa-tag"></i> Request Quote</span>
+                    </div>
+                    <a href="{{ url_for('shop_product', slug=product.slug) }}" class="btn btn-primary btn-sm">Order Now</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-products">
+            <i class="fas fa-box-open"></i>
+            <h3>No products yet</h3>
+            <p>Products in this category are coming soon!</p>
+            <a href="{{ url_for('home') }}#contact" class="btn btn-primary">Request Custom Quote</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-hero {
+        background: linear-gradient(135deg, var(--primary-color), #1a365d);
+        color: white;
+        padding: 120px 0 60px;
+    }
+    
+    .breadcrumb {
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+    }
+    
+    .breadcrumb a {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .breadcrumb a:hover {
+        color: white;
+    }
+    
+    .breadcrumb span {
+        margin: 0 10px;
+        color: rgba(255,255,255,0.5);
+    }
+    
+    .category-hero h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .category-hero h1 i {
+        font-size: 2rem;
+        color: var(--secondary-color);
+    }
+    
+    .category-hero p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        max-width: 600px;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        height: 200px;
+        overflow: hidden;
+        background: var(--light-bg);
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .product-placeholder {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #ddd;
+    }
+    
+    .product-info {
+        padding: 25px;
+    }
+    
+    .product-info h3 {
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .product-desc {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+    
+    .product-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .product-min {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .product-min i {
+        margin-right: 5px;
+        color: var(--secondary-color);
+    }
+    
+    .quote-badge {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        background: rgba(255, 159, 28, 0.1);
+        padding: 5px 12px;
+        border-radius: 15px;
+    }
+    
+    .quote-badge i {
+        margin-right: 5px;
+    }
+    
+    .btn-sm {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .no-products {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    
+    .no-products i {
+        font-size: 4rem;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .no-products h3 {
+        margin-bottom: 10px;
+    }
+    
+    .no-products p {
+        color: var(--text-light);
+        margin-bottom: 25px;
+    }
+</style>
+{% endblock %}
+

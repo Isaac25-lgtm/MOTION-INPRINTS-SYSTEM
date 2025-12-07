@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - Admin - Motion{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="container">
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+                    <span>/</span>
+                    <a href="{{ url_for('admin_products') }}">Products</a>
+                    <span>/</span>
+                    <span>Add</span>
+                </nav>
+                <h1>Add New Product</h1>
+            </div>
+        </div>
+        
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('admin_add_product') }}">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Product Name *</label>
+                            <input type="text" id="name" name="name" class="form-control" required
+                                   placeholder="e.g., Standard Business Cards">
+                        </div>
+                        <div class="form-group">
+                            <label for="slug">URL Slug *</label>
+                            <input type="text" id="slug" name="slug" class="form-control" required
+                                   placeholder="e.g., standard-business-cards">
+                            <small>Lowercase, no spaces, use hyphens</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_id">Category *</label>
+                        <select id="category_id" name="category_id" class="form-control" required>
+                            <option value="">Select Category</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" class="form-control" rows="3"
+                                  placeholder="Product description..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Pricing</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="base_price">Base Price (UGX) *</label>
+                            <input type="number" id="base_price" name="base_price" class="form-control" required
+                                   value="0" min="0" step="1000" placeholder="50000">
+                        </div>
+                        <div class="form-group">
+                            <label for="min_quantity">Minimum Quantity *</label>
+                            <input type="number" id="min_quantity" name="min_quantity" class="form-control" required
+                                   value="1" min="1" placeholder="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Product Options</h3>
+                    <p class="section-help">Enter options separated by commas</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="size_options">Size Options</label>
+                            <input type="text" id="size_options" name="size_options" class="form-control"
+                                   placeholder="A4, A5, A6, Custom">
+                        </div>
+                        <div class="form-group">
+                            <label for="material_options">Material Options</label>
+                            <input type="text" id="material_options" name="material_options" class="form-control"
+                                   placeholder="Glossy, Matte, Silk">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="color_options">Color Options</label>
+                            <input type="text" id="color_options" name="color_options" class="form-control"
+                                   placeholder="Full Color, Black & White">
+                        </div>
+                        <div class="form-group">
+                            <label for="finishing_options">Finishing Options</label>
+                            <input type="text" id="finishing_options" name="finishing_options" class="form-control"
+                                   placeholder="Laminated, UV Coated, None">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{{ url_for('admin_products') }}" class="btn btn-outline">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-section {
+        padding: 100px 20px 60px;
+        background: #f0f2f5;
+        min-height: 100vh;
+    }
+    
+    .breadcrumb {
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: var(--text-light);
+    }
+    
+    .breadcrumb span {
+        margin: 0 10px;
+        color: #ccc;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+        max-width: 900px;
+    }
+    
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .form-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+    }
+    
+    .section-help {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 20px;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        color: var(--text-light);
+        font-size: 0.8rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('name').addEventListener('input', function() {
+        const slug = this.value.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+        document.getElementById('slug').value = slug;
+    });
+</script>
+{% endblock %}
+

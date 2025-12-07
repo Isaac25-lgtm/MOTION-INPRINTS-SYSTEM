@@ -6,6 +6,21 @@
     <title>{% block title %}Motion — Design · Print · Brand{% endblock %}</title>
     <meta name="description" content="{% block description %}Premier design, printing, and branding studio in Kampala. High-quality corporate printing, signage, and creative design services.{% endblock %}">
     
+    <!-- SEO Keywords -->
+    <meta name="keywords" content="printing services Uganda, graphic design Kampala, web design Uganda, digital printing, UV printing, offset printing, sublimation printing, promotional items Uganda, signage Kampala, business cards printing, flyers printing, branding services, logo design Uganda, corporate branding, billboard printing, banner printing, t-shirt printing Uganda, mug printing, vehicle branding Kampala, 3D signage, e-commerce website Uganda">
+    <meta name="author" content="Motion Design & Printing Studio">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Motion — Design · Print · Brand">
+    <meta property="og:description" content="Premier design, printing, and branding studio in Kampala, Uganda. Quality corporate printing, signage, and creative design services.">
+    <meta property="og:locale" content="en_UG">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 140'><circle cx='85' cy='14' r='12' fill='%232196F3'/><rect x='10' y='40' rx='20' ry='20' width='100' height='100' fill='%232196F3'/><path d='M 75 58 Q 70 75, 62 95 Q 58 105, 55 112 Q 52 120, 58 124 Q 65 128, 78 118 Q 88 110, 98 98' fill='none' stroke='white' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 140'><circle cx='85' cy='14' r='12' fill='%232196F3'/><rect x='10' y='40' rx='20' ry='20' width='100' height='100' fill='%232196F3'/><path d='M 75 58 Q 70 75, 62 95 Q 58 105, 55 112 Q 52 120, 58 124 Q 65 128, 78 118 Q 88 110, 98 98' fill='none' stroke='white' stroke-width='12' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +44,17 @@
     </script>
 </head>
 <body>
+    <!-- Page Loader -->
+    <div id="page-loader" class="page-loader">
+        <div class="loader-content">
+            <svg class="loader-logo" width="80" height="95" viewBox="0 0 120 140">
+                <circle cx="85" cy="14" r="12" fill="#2196F3" class="loader-dot"/>
+                <rect x="10" y="40" rx="20" ry="20" width="100" height="100" fill="#2196F3"/>
+                <path d="M 75 58 Q 70 75, 62 95 Q 58 105, 55 112 Q 52 120, 58 124 Q 65 128, 78 118 Q 88 110, 98 98" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" class="loader-path"/>
+            </svg>
+            <p class="loader-text">Loading...</p>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="navbar">
@@ -53,16 +79,16 @@
             </div>
             <ul class="nav-links">
                 <li><a href="{{ url_for('home') }}#home">Home</a></li>
+                <li><a href="{{ url_for('shop') }}">Shop</a></li>
                 <li><a href="{{ url_for('home') }}#services">Services</a></li>
                 <li><a href="{{ url_for('home') }}#portfolio">Portfolio</a></li>
-                <li><a href="{{ url_for('home') }}#about">About</a></li>
-                <li><a href="{{ url_for('home') }}#testimonials">Testimonials</a></li>
                 <li><a href="{{ url_for('home') }}#contact">Contact</a></li>
                 {% if current_user.is_authenticated %}
                     {% if current_user.is_admin %}
                         <li><a href="{{ url_for('admin_dashboard') }}" class="nav-highlight">Admin</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('dashboard') }}" class="nav-highlight">My Orders</a></li>
+                        <li><a href="{{ url_for('cart') }}" title="Shopping Cart"><i class="fas fa-shopping-cart"></i></a></li>
+                        <li><a href="{{ url_for('dashboard') }}" class="nav-highlight">Dashboard</a></li>
                     {% endif %}
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
@@ -127,13 +153,47 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/256782656721?text=Hello%20Motion,%20I%20would%20like%20to%20inquire%20about%20your%20services." 
+    <a href="https://wa.me/256787984135?text=Hello%20Motion,%20I%20would%20like%20to%20inquire%20about%20your%20services." 
        class="floating-whatsapp" target="_blank" aria-label="Chat on WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
     
-    <!-- Flash message close functionality -->
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="scroll-to-top" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+    
+    <!-- Page Loader & Scroll-to-Top Script -->
     <script>
+        // Hide loader when page is fully loaded
+        window.addEventListener('load', function() {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 500); // Small delay for smooth transition
+            }
+        });
+
+        // Scroll to Top Button
+        const scrollToTopBtn = document.getElementById('scroll-to-top');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Flash message close functionality
         document.querySelectorAll('.flash-close').forEach(btn => {
             btn.addEventListener('click', function() {
                 this.parentElement.remove();

@@ -1,8 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <!-- Hero Section -->
+    <!-- Hero Section with Animated Background Slideshow -->
     <section id="home" class="hero">
+        <div class="hero-slideshow">
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/web designing and ecommerce sites.jpg') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/graphicdesign.webp') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/digital printing.jpg') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/glassprinting.jpg') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/offsetprinting.webp') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/sublimationprinting.jpg') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/promotionalitems.png') }}')"></div>
+            <div class="hero-slide" style="background-image: url('{{ url_for('static', filename='images/3Dsigns.avif') }}')"></div>
+        </div>
+        <div class="hero-overlay"></div>
         <div class="container hero-content">
             <h1>Design. Print. Brand<br>All in One Place.</h1>
             <p>Premier design, printing, and branding studio in Kampala, Uganda</p>
@@ -11,76 +22,85 @@
     </section>
 
     <!-- Services Section -->
-    <section id="services" class="section">
+    <section id="services" class="section services-section">
         <div class="container">
             <div class="section-header">
+                <span class="section-badge">What We Offer</span>
                 <h2>Our Services</h2>
                 <p>Comprehensive solutions for all your business branding needs.</p>
             </div>
             <div class="services-grid">
-                <!-- Digital Printing -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-print"></i>
-                    </div>
-                    <h3>Digital Printing</h3>
-                    <p>Fast, high-quality prints for brochures, flyers, business cards, and marketing materials.</p>
-                </div>
-                <!-- UV Printing -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-sun"></i>
-                    </div>
-                    <h3>UV Printing</h3>
-                    <p>Vibrant, durable prints on any surface — acrylic, glass, wood, metal, and more.</p>
-                </div>
-                <!-- Offset Printing -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-layer-group"></i>
-                    </div>
-                    <h3>Offset Printing</h3>
-                    <p>Cost-effective bulk printing for books, magazines, newspapers, and large orders.</p>
-                </div>
-                <!-- Sublimation Printing -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-fill-drip"></i>
-                    </div>
-                    <h3>Sublimation Printing</h3>
-                    <p>Full-color prints on fabrics, mugs, caps, and promotional products that last.</p>
-                </div>
-                <!-- Promotional Items -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <h3>Promotional Items</h3>
-                    <p>Custom branded merchandise, apparel, and corporate gifts for your business.</p>
-                </div>
-                <!-- Signage -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-sign"></i>
-                    </div>
-                    <h3>Signage</h3>
-                    <p>Indoor and outdoor signage, banners, billboards, and vehicle branding.</p>
-                </div>
-                <!-- Graphic Design -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-pen-nib"></i>
-                    </div>
-                    <h3>Graphic Design</h3>
-                    <p>Creative branding, logo design, and marketing materials that stand out.</p>
-                </div>
                 <!-- Web Design & E-commerce -->
                 <div class="service-card">
-                    <div class="service-icon">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #667eea, #764ba2);">
                         <i class="fas fa-laptop-code"></i>
                     </div>
                     <h3>Web Design & E-commerce</h3>
                     <p>Modern websites and online stores to grow your digital presence and sales.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Digital Printing -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3>Digital Printing</h3>
+                    <p>Fast, high-quality prints for brochures, flyers, business cards, and marketing materials.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- UV Printing -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>UV Printing</h3>
+                    <p>Vibrant, durable prints on any surface — acrylic, glass, wood, metal, and more.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Offset Printing -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #43e97b, #38f9d7);">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Offset Printing</h3>
+                    <p>Cost-effective bulk printing for books, magazines, newspapers, and large orders.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Sublimation Printing -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #fa709a, #fee140);">
+                        <i class="fas fa-fill-drip"></i>
+                    </div>
+                    <h3>Sublimation Printing</h3>
+                    <p>Full-color prints on fabrics, mugs, caps, and promotional products that last.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Promotional Items -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #ff9a9e, #fecfef);">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h3>Promotional Items</h3>
+                    <p>Custom branded merchandise, apparel, and corporate gifts for your business.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Signage -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #a18cd1, #fbc2eb);">
+                        <i class="fas fa-sign"></i>
+                    </div>
+                    <h3>Signage</h3>
+                    <p>Indoor and outdoor signage, banners, billboards, and vehicle branding.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <!-- Graphic Design -->
+                <div class="service-card">
+                    <div class="service-icon" style="--icon-gradient: linear-gradient(135deg, #ff9f1c, #ffbf69);">
+                        <i class="fas fa-pen-nib"></i>
+                    </div>
+                    <h3>Graphic Design</h3>
+                    <p>Creative branding, logo design, and marketing materials that stand out.</p>
+                    <a href="#contact" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
         </div>
@@ -94,10 +114,21 @@
                 <p>A glimpse into our creative portfolio.</p>
             </div>
             <div class="portfolio-grid">
-                <!-- 1. Graphic Design -->
+                <!-- 1. Web Design -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=800&q=80" alt="Graphic Design" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/web designing and ecommerce sites.jpg') }}" alt="Web Design" loading="lazy">
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Web Design</h3>
+                        <p>E-commerce & Corporate Sites</p>
+                    </div>
+                </div>
+
+                <!-- 2. Graphic Design -->
+                <div class="portfolio-item">
+                    <div class="portfolio-img-wrapper">
+                        <img src="{{ url_for('static', filename='images/graphicdesign.webp') }}" alt="Graphic Design" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Graphic Design</h3>
@@ -105,10 +136,10 @@
                     </div>
                 </div>
 
-                <!-- 2. Digital Printing -->
+                <!-- 3. Digital Printing -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80" alt="Digital Printing" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/digital printing.jpg') }}" alt="Digital Printing" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Digital Printing</h3>
@@ -116,10 +147,10 @@
                     </div>
                 </div>
 
-                <!-- 3. UV Printing -->
+                <!-- 4. UV Printing -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80" alt="UV Printing" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/glassprinting.jpg') }}" alt="UV Printing" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>UV Printing</h3>
@@ -127,10 +158,10 @@
                     </div>
                 </div>
 
-                <!-- 4. Offset Printing -->
+                <!-- 5. Offset Printing -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1544377193-33dcf4d68fb5?auto=format&fit=crop&w=800&q=80" alt="Offset Printing" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/offsetprinting.webp') }}" alt="Offset Printing" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Offset Printing</h3>
@@ -138,10 +169,10 @@
                     </div>
                 </div>
 
-                <!-- 5. Sublimation Printing -->
+                <!-- 6. Sublimation Printing -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1577979749830-f1d742b96791?auto=format&fit=crop&w=800&q=80" alt="Sublimation Printing" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/sublimationprinting.jpg') }}" alt="Sublimation Printing" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Sublimation Printing</h3>
@@ -149,10 +180,10 @@
                     </div>
                 </div>
 
-                <!-- 6. Promotional Items -->
+                <!-- 7. Promotional Items -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1571513722275-4b41940f54b8?auto=format&fit=crop&w=800&q=80" alt="Promotional Items" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/promotionalitems.png') }}" alt="Promotional Items" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Promotional Items</h3>
@@ -160,25 +191,14 @@
                     </div>
                 </div>
 
-                <!-- 7. Signage -->
+                <!-- 8. Signage -->
                 <div class="portfolio-item">
                     <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1572044162444-ad60f128bdea?auto=format&fit=crop&w=800&q=80" alt="Signage" loading="lazy">
+                        <img src="{{ url_for('static', filename='images/3Dsigns.avif') }}" alt="Signage" loading="lazy">
                     </div>
                     <div class="portfolio-content">
                         <h3>Signage Solutions</h3>
                         <p>3D Signs & Billboards</p>
-                    </div>
-                </div>
-
-                <!-- 8. Web Design -->
-                <div class="portfolio-item">
-                    <div class="portfolio-img-wrapper">
-                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80" alt="Web Design" loading="lazy">
-                    </div>
-                    <div class="portfolio-content">
-                        <h3>Web Design</h3>
-                        <p>E-commerce & Corporate Sites</p>
                     </div>
                 </div>
             </div>
@@ -236,18 +256,18 @@
             <div class="testimonials-grid">
                 <div class="testimonial-card">
                     <p class="testimonial-text">"Motion transformed our brand image. The print quality and design were exceptional. Highly recommend!"</p>
-                    <p class="testimonial-author">Sarah K.</p>
-                    <p class="testimonial-company">Marketing Director, Stanbic Bank</p>
+                    <p class="testimonial-author">Jesse Mwanga Limo</p>
+                    <p class="testimonial-company">Founder, Limtai Agency</p>
                 </div>
                 <div class="testimonial-card">
                     <p class="testimonial-text">"Excellent service and quick delivery. Our go-to studio for all branding needs."</p>
-                    <p class="testimonial-author">David M.</p>
-                    <p class="testimonial-company">CEO, TechEvents Uganda</p>
+                    <p class="testimonial-author">Kwemboi Joshua</p>
+                    <p class="testimonial-company">Founding Partner, Roots Advocates</p>
                 </div>
                 <div class="testimonial-card">
                     <p class="testimonial-text">"Professional team that pays attention to detail. The turnaround time was impressive."</p>
-                    <p class="testimonial-author">Grace A.</p>
-                    <p class="testimonial-company">Kampala Law Firm</p>
+                    <p class="testimonial-author">Sali Samuel</p>
+                    <p class="testimonial-company">Business Executive, Pearl Bank</p>
                 </div>
             </div>
         </div>
@@ -277,7 +297,7 @@
                     </div>
                     <div class="info-item">
                         <i class="fas fa-phone-alt"></i>
-                        <p><a href="tel:0782656721">0782656721</a></p>
+                        <p><a href="tel:0787984135">0787984135</a></p>
                     </div>
                     <div class="info-item">
                         <i class="fas fa-envelope"></i>
@@ -328,6 +348,7 @@
                             <label for="service">Service Interested In</label>
                             <select id="service" name="service" class="form-control">
                                 <option value="general">General Inquiry</option>
+                                <option value="web">Web Design & E-commerce</option>
                                 <option value="digital-printing">Digital Printing</option>
                                 <option value="uv-printing">UV Printing</option>
                                 <option value="offset-printing">Offset Printing</option>
@@ -335,7 +356,6 @@
                                 <option value="promotional">Promotional Items</option>
                                 <option value="signage">Signage</option>
                                 <option value="design">Graphic Design</option>
-                                <option value="web">Web Design & E-commerce</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -345,7 +365,7 @@
                         <button type="submit" class="btn btn-primary" style="width: 100%;">Send Request</button>
                     </form>
 
-                    <a href="https://wa.me/256782656721?text=Hello%20Motion,%20I%20would%20like%20to%20place%20an%20order." target="_blank" class="whatsapp-btn">
+                    <a href="https://wa.me/256787984135?text=Hello%20Motion,%20I%20would%20like%20to%20place%20an%20order." target="_blank" class="whatsapp-btn">
                         <i class="fab fa-whatsapp" style="font-size: 1.2rem;"></i> Or Order Instantly on WhatsApp
                     </a>
                 </div>

@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+
+{% block title %}Quote #{{ quote.id }} - Motion{% endblock %}
+
+{% block content %}
+<section class="quote-hero">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span>/</span>
+            <a href="{{ url_for('my_quotes') }}">My Quotes</a>
+            <span>/</span>
+            <span>Quote #{{ quote.id }}</span>
+        </nav>
+        <h1>Quote Request #{{ quote.id }}</h1>
+    </div>
+</section>
+
+<section class="quote-detail-section section">
+    <div class="container">
+        <div class="quote-layout">
+            <div class="quote-items">
+                <h2>Items in Quote</h2>
+                {% for item in items %}
+                <div class="quote-item">
+                    <div class="item-info">
+                        <h3>{{ item.product_name }}</h3>
+                        <div class="item-specs">
+                            <span><strong>Quantity:</strong> {{ item.quantity }}</span>
+                            {% if item.size %}<span><strong>Size:</strong> {{ item.size }}</span>{% endif %}
+                            {% if item.custom_size %}<span><strong>Custom Size:</strong> {{ item.custom_size }}</span>{% endif %}
+                            {% if item.material %}<span><strong>Material:</strong> {{ item.material }}</span>{% endif %}
+                            {% if item.color %}<span><strong>Color:</strong> {{ item.color }}</span>{% endif %}
+                            {% if item.finishing %}<span><strong>Finishing:</strong> {{ item.finishing }}</span>{% endif %}
+                        </div>
+                        {% if item.design_file %}
+                        <div class="design-link">
+                            <i class="fas fa-file-image"></i>
+                            <a href="{{ url_for('uploaded_file', filename=item.design_file) }}" target="_blank">View Uploaded Design</a>
+                        </div>
+                        {% endif %}
+                        {% if item.design_notes %}
+                        <div class="design-notes">
+                            <strong>Notes:</strong> {{ item.design_notes }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-base-price">
+                        <span class="label">Base Price</span>
+                        <span class="price">UGX {{ "{:,.0f}".format(item.base_price) }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if quote.customer_notes %}
+                <div class="customer-notes">
+                    <h3><i class="fas fa-sticky-note"></i> Your Notes</h3>
+                    <p>{{ quote.customer_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="quote-sidebar">
+                <div class="status-card status-{{ quote.status.lower().replace(' ', '-') }}">
+                    <div class="status-header">
+                        <span class="status-badge">{{ quote.status }}</span>
+                        <span class="quote-date">{{ quote.created_at.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    
+                    {% if quote.status == 'Pending' %}
+                    <div class="status-message">
+                        <i class="fas fa-clock"></i>
+                        <p>We're reviewing your quote request. You'll receive a response within 24 hours.</p>
+                    </div>
+                    {% elif quote.status == 'Quoted' %}
+                    <div class="pricing-breakdown">
+                        <div class="price-line">
+                            <span>Quoted Price</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.quoted_price or 0) }}</span>
+                        </div>
+                        {% if quote.discount_applied > 0 %}
+                        <div class="price-line discount">
+                            <span>Loyalty Discount ({{ current_user.customer_tier }})</span>
+                            <span>- UGX {{ "{:,.0f}".format(quote.discount_applied) }}</span>
+                        </div>
+                        {% endif %}
+                        {% if quote.delivery_fee > 0 %}
+                        <div class="price-line">
+                            <span>Delivery Fee</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.delivery_fee) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="price-line total">
+                            <span>Total Amount</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.total_price or 0) }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if quote.admin_notes %}
+                    <div class="admin-notes">
+                        <h4>Message from Motion</h4>
+                        <p>{{ quote.admin_notes }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if quote.valid_until %}
+                    <div class="valid-until">
+                        <i class="fas fa-hourglass-half"></i>
+                        Quote valid until: <strong>{{ quote.valid_until.strftime('%b %d, %Y') }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="quote-actions">
+                        <form action="{{ url_for('accept_quote', quote_id=quote.id) }}" method="POST">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-check"></i> Accept Quote & Place Order
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-outline btn-block" onclick="document.getElementById('reject-modal').style.display='flex'">
+                            <i class="fas fa-times"></i> Decline Quote
+                        </button>
+                    </div>
+                    {% elif quote.status == 'Converted' %}
+                    <div class="status-message success">
+                        <i class="fas fa-check-circle"></i>
+                        <p>This quote has been converted to an order. <a href="{{ url_for('view_order', order_id=quote.order_id) }}">View Order</a></p>
+                    </div>
+                    {% elif quote.status == 'Rejected' %}
+                    <div class="status-message danger">
+                        <i class="fas fa-times-circle"></i>
+                        <p>You declined this quote.</p>
+                    </div>
+                    {% elif quote.status == 'Expired' %}
+                    <div class="status-message warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>This quote has expired. Please request a new quote.</p>
+                    </div>
+                    <a href="{{ url_for('shop') }}" class="btn btn-primary btn-block">
+                        <i class="fas fa-shopping-cart"></i> Start New Order
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <div class="help-card">
+                    <h4><i class="fas fa-question-circle"></i> Need Help?</h4>
+                    <p>Have questions about this quote?</p>
+                    <a href="https://wa.me/256787984135?text=Hi,%20I%20have%20a%20question%20about%20Quote%20%23{{ quote.id }}" 
+                       target="_blank" class="btn btn-whatsapp btn-block">
+                        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Reject Modal -->
+<div id="reject-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>Decline Quote</h3>
+        <form action="{{ url_for('reject_quote', quote_id=quote.id) }}" method="POST">
+            <div class="form-group">
+                <label for="reason">Reason (Optional)</label>
+                <textarea id="reason" name="reason" class="form-control" rows="3" 
+                          placeholder="Let us know why you're declining..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('reject-modal').style.display='none'">Cancel</button>
+                <button type="submit" class="btn btn-danger">Decline Quote</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .quote-hero {
+        background: var(--primary-color);
+        color: white;
+        padding: 100px 0 40px;
+    }
+    
+    .breadcrumb {
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .breadcrumb span {
+        margin: 0 10px;
+        color: rgba(255,255,255,0.4);
+    }
+    
+    .quote-hero h1 {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .quote-layout {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .quote-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .quote-items h2 {
+        margin-bottom: 25px;
+        font-size: 1.5rem;
+    }
+    
+    .quote-item {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 20px;
+    }
+    
+    .quote-item h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .item-specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .item-specs span {
+        background: var(--light-bg);
+        padding: 5px 12px;
+        border-radius: 5px;
+    }
+    
+    .design-link {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .design-link a {
+        color: var(--secondary-color);
+    }
+    
+    .design-notes {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        background: var(--light-bg);
+        padding: 10px 15px;
+        border-radius: 8px;
+    }
+    
+    .item-base-price {
+        text-align: right;
+        flex-shrink: 0;
+    }
+    
+    .item-base-price .label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+    
+    .item-base-price .price {
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .customer-notes {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-top: 25px;
+    }
+    
+    .customer-notes h3 {
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+    
+    .status-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+    
+    .status-header {
+        background: var(--light-bg);
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .status-badge {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        background: #6c757d;
+        color: white;
+    }
+    
+    .status-pending .status-badge { background: #ffc107; color: #212529; }
+    .status-quoted .status-badge { background: #17a2b8; }
+    .status-converted .status-badge { background: #28a745; }
+    .status-rejected .status-badge { background: #dc3545; }
+    .status-expired .status-badge { background: #6c757d; }
+    
+    .quote-date {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .status-message {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .status-message i {
+        font-size: 2rem;
+        color: var(--secondary-color);
+        margin-bottom: 10px;
+    }
+    
+    .status-message.success i { color: #28a745; }
+    .status-message.danger i { color: #dc3545; }
+    .status-message.warning i { color: #ffc107; }
+    
+    .status-message p {
+        color: var(--text-light);
+        margin: 0;
+    }
+    
+    .pricing-breakdown {
+        padding: 20px;
+    }
+    
+    .price-line {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        font-size: 0.95rem;
+    }
+    
+    .price-line.discount {
+        color: #28a745;
+    }
+    
+    .price-line.total {
+        border-top: 2px solid var(--border-color);
+        margin-top: 10px;
+        padding-top: 15px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--secondary-color);
+    }
+    
+    .admin-notes {
+        padding: 0 20px 20px;
+    }
+    
+    .admin-notes h4 {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .admin-notes p {
+        background: var(--light-bg);
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+    
+    .valid-until {
+        padding: 15px 20px;
+        background: #fff3cd;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    
+    .quote-actions {
+        padding: 20px;
+    }
+    
+    .quote-actions .btn {
+        margin-bottom: 10px;
+    }
+    
+    .help-card {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+    
+    .help-card h4 {
+        margin-bottom: 10px;
+    }
+    
+    .help-card p {
+        color: var(--text-light);
+        margin-bottom: 15px;
+    }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #20bd5a;
+        color: white;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+    }
+    
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+    
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 450px;
+        width: 90%;
+    }
+    
+    .modal-content h3 {
+        margin-bottom: 20px;
+    }
+    
+    .modal-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+

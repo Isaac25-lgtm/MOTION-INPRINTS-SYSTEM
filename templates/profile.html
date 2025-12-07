@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Motion{% endblock %}
+
+{% block content %}
+<section class="profile-hero">
+    <div class="container">
+        <h1><i class="fas fa-user-circle"></i> My Profile</h1>
+        <p>Manage your account information</p>
+    </div>
+</section>
+
+<section class="profile-section section">
+    <div class="container">
+        <div class="profile-layout">
+            <div class="profile-sidebar">
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h3>{{ current_user.name }}</h3>
+                    <p class="profile-email">{{ current_user.email }}</p>
+                    
+                    <div class="tier-badge tier-{{ current_user.customer_tier.lower() }}">
+                        <i class="fas fa-star"></i> {{ current_user.customer_tier }} Member
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-value">{{ current_user.total_orders }}</span>
+                            <span class="stat-label">Orders</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">{{ current_user.discount_percent }}%</span>
+                            <span class="stat-label">Discount</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tier-info">
+                    <h4>Loyalty Tiers</h4>
+                    <ul class="tier-list">
+                        <li class="{% if current_user.customer_tier == 'New' %}active{% endif %}">
+                            <span class="tier-name">New</span>
+                            <span class="tier-orders">0-4 orders</span>
+                            <span class="tier-discount">0% off</span>
+                        </li>
+                        <li class="{% if current_user.customer_tier == 'Bronze' %}active{% endif %}">
+                            <span class="tier-name">Bronze</span>
+                            <span class="tier-orders">5+ orders</span>
+                            <span class="tier-discount">5% off</span>
+                        </li>
+                        <li class="{% if current_user.customer_tier == 'Silver' %}active{% endif %}">
+                            <span class="tier-name">Silver</span>
+                            <span class="tier-orders">15+ orders</span>
+                            <span class="tier-discount">10% off</span>
+                        </li>
+                        <li class="{% if current_user.customer_tier == 'Gold' %}active{% endif %}">
+                            <span class="tier-name">Gold</span>
+                            <span class="tier-orders">30+ orders</span>
+                            <span class="tier-discount">15% off</span>
+                        </li>
+                        <li class="{% if current_user.customer_tier == 'VIP' %}active{% endif %}">
+                            <span class="tier-name">VIP</span>
+                            <span class="tier-orders">50+ orders</span>
+                            <span class="tier-discount">20% off</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="profile-main">
+                <div class="form-card">
+                    <h3><i class="fas fa-edit"></i> Edit Profile</h3>
+                    
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" name="name" class="form-control" 
+                                       value="{{ current_user.name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" class="form-control" 
+                                       value="{{ current_user.email }}" disabled>
+                                <small>Email cannot be changed</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="form-control" 
+                                       value="{{ current_user.phone or '' }}" placeholder="0700000000">
+                            </div>
+                            <div class="form-group">
+                                <label for="company">Company/Business</label>
+                                <input type="text" id="company" name="company" class="form-control" 
+                                       value="{{ current_user.company or '' }}" placeholder="Optional">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Delivery Address</label>
+                            <textarea id="address" name="address" class="form-control" rows="3"
+                                      placeholder="Your delivery address for orders...">{{ current_user.address or '' }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="quick-links">
+                    <h3>Quick Links</h3>
+                    <div class="links-grid">
+                        <a href="{{ url_for('dashboard') }}" class="quick-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('my_quotes') }}" class="quick-link">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>My Quotes</span>
+                        </a>
+                        <a href="{{ url_for('cart') }}" class="quick-link">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>My Cart</span>
+                        </a>
+                        <a href="{{ url_for('shop') }}" class="quick-link">
+                            <i class="fas fa-store"></i>
+                            <span>Shop</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-hero {
+        background: linear-gradient(135deg, var(--primary-color), #1a365d);
+        color: white;
+        padding: 120px 0 60px;
+        text-align: center;
+    }
+    
+    .profile-hero h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .profile-hero h1 i {
+        margin-right: 15px;
+        color: var(--secondary-color);
+    }
+    
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+    
+    @media (max-width: 991px) {
+        .profile-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--secondary-color), #ffb347);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    .profile-card h3 {
+        margin-bottom: 5px;
+    }
+    
+    .profile-email {
+        color: var(--text-light);
+        margin-bottom: 15px;
+    }
+    
+    .tier-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+    
+    .tier-new { background: #e2e3e5; color: #383d41; }
+    .tier-bronze { background: linear-gradient(135deg, #cd7f32, #b87333); color: white; }
+    .tier-silver { background: linear-gradient(135deg, #c0c0c0, #a8a8a8); color: #333; }
+    .tier-gold { background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; }
+    .tier-vip { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .stat-value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary-color);
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .tier-info {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 25px;
+    }
+    
+    .tier-info h4 {
+        margin-bottom: 15px;
+        font-size: 1rem;
+    }
+    
+    .tier-list {
+        list-style: none;
+    }
+    
+    .tier-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        background: var(--light-bg);
+    }
+    
+    .tier-list li.active {
+        background: var(--secondary-color);
+        color: white;
+    }
+    
+    .tier-name {
+        font-weight: 600;
+    }
+    
+    .tier-orders {
+        color: inherit;
+        opacity: 0.8;
+    }
+    
+    .tier-discount {
+        font-weight: 600;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .form-card h3 {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--light-bg);
+    }
+    
+    .form-card h3 i {
+        margin-right: 10px;
+        color: var(--secondary-color);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        color: var(--text-light);
+        font-size: 0.8rem;
+    }
+    
+    .quick-links {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 25px;
+    }
+    
+    .quick-links h3 {
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+    }
+    
+    .links-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .quick-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        background: var(--light-bg);
+        border-radius: 10px;
+        color: var(--primary-color);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-link:hover {
+        background: var(--secondary-color);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .quick-link i {
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+

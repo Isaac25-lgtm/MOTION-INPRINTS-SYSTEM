@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+
+{% block title %}Quote #{{ quote.id }} - Admin - Motion{% endblock %}
+
+{% block content %}
+<section class="admin-hero">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+            <span>/</span>
+            <a href="{{ url_for('admin_quotes') }}">Quotes</a>
+            <span>/</span>
+            <span>Quote #{{ quote.id }}</span>
+        </nav>
+        <h1>Quote Request #{{ quote.id }}</h1>
+    </div>
+</section>
+
+<section class="admin-section section">
+    <div class="container">
+        <div class="quote-layout">
+            <div class="quote-main">
+                <!-- Customer Info -->
+                <div class="info-card">
+                    <h3><i class="fas fa-user"></i> Customer Information</h3>
+                    <div class="customer-details">
+                        <div class="detail-row">
+                            <span class="label">Name:</span>
+                            <span class="value">{{ quote.user.name }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Email:</span>
+                            <span class="value"><a href="mailto:{{ quote.user.email }}">{{ quote.user.email }}</a></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Phone:</span>
+                            <span class="value">{{ quote.user.phone or 'Not provided' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Company:</span>
+                            <span class="value">{{ quote.user.company or 'N/A' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Customer Tier:</span>
+                            <span class="value">
+                                <span class="tier-badge tier-{{ quote.user.customer_tier.lower() }}">
+                                    {{ quote.user.customer_tier }} ({{ quote.user.discount_percent }}% discount)
+                                </span>
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Total Orders:</span>
+                            <span class="value">{{ quote.user.total_orders }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quote Items -->
+                <div class="info-card">
+                    <h3><i class="fas fa-shopping-bag"></i> Quote Items</h3>
+                    {% for item in items %}
+                    <div class="quote-item">
+                        <div class="item-header">
+                            <h4>{{ item.product_name }}</h4>
+                            <span class="item-qty">× {{ item.quantity }}</span>
+                        </div>
+                        <div class="item-specs">
+                            {% if item.size %}<span><i class="fas fa-ruler"></i> {{ item.size }}</span>{% endif %}
+                            {% if item.custom_size %}<span><i class="fas fa-expand-arrows-alt"></i> {{ item.custom_size }}</span>{% endif %}
+                            {% if item.material %}<span><i class="fas fa-layer-group"></i> {{ item.material }}</span>{% endif %}
+                            {% if item.color %}<span><i class="fas fa-palette"></i> {{ item.color }}</span>{% endif %}
+                            {% if item.finishing %}<span><i class="fas fa-magic"></i> {{ item.finishing }}</span>{% endif %}
+                        </div>
+                        {% if item.design_file %}
+                        <div class="design-file">
+                            <a href="{{ url_for('uploaded_file', filename=item.design_file) }}" target="_blank" class="btn btn-sm btn-outline">
+                                <i class="fas fa-download"></i> Download Design File
+                            </a>
+                        </div>
+                        {% endif %}
+                        {% if item.design_notes %}
+                        <div class="design-notes">
+                            <strong>Customer Notes:</strong> {{ item.design_notes }}
+                        </div>
+                        {% endif %}
+                        <div class="item-base">
+                            Base Price: UGX {{ "{:,.0f}".format(item.base_price) }}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    {% if quote.customer_notes %}
+                    <div class="customer-notes">
+                        <h4><i class="fas fa-comment"></i> Additional Notes from Customer</h4>
+                        <p>{{ quote.customer_notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="quote-sidebar">
+                <!-- Status Card -->
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-badge status-{{ quote.status.lower().replace(' ', '-') }}">{{ quote.status }}</span>
+                    </div>
+                    <div class="status-dates">
+                        <p><strong>Requested:</strong> {{ quote.created_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                        {% if quote.quoted_at %}
+                        <p><strong>Quoted:</strong> {{ quote.quoted_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                        {% endif %}
+                        {% if quote.responded_at %}
+                        <p><strong>Responded:</strong> {{ quote.responded_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quote Form or Details -->
+                {% if quote.status == 'Pending' %}
+                <div class="quote-form-card">
+                    <h3><i class="fas fa-calculator"></i> Send Quote</h3>
+                    
+                    <div class="suggested-price">
+                        <span class="label">Suggested Base Total:</span>
+                        <span class="amount">UGX {{ "{:,.0f}".format(suggested_total) }}</span>
+                    </div>
+
+                    <form action="{{ url_for('admin_quote_detail', quote_id=quote.id) }}" method="POST">
+                        <input type="hidden" name="action" value="send_quote">
+                        
+                        <div class="form-group">
+                            <label for="quoted_price">Your Quoted Price (UGX) *</label>
+                            <input type="number" id="quoted_price" name="quoted_price" class="form-control" 
+                                   value="{{ suggested_total }}" required min="0" step="1000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="discount_applied">Loyalty Discount (UGX)</label>
+                            <input type="number" id="discount_applied" name="discount_applied" class="form-control" 
+                                   value="{{ (suggested_total * user_discount / 100)|int }}" min="0" step="1000">
+                            <small>Customer tier: {{ quote.user.customer_tier }} ({{ user_discount }}%)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="delivery_fee">Delivery Fee (UGX)</label>
+                            <input type="number" id="delivery_fee" name="delivery_fee" class="form-control" 
+                                   value="0" min="0" step="1000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="valid_days">Quote Valid For (Days)</label>
+                            <select id="valid_days" name="valid_days" class="form-control">
+                                <option value="3">3 days</option>
+                                <option value="7" selected>7 days</option>
+                                <option value="14">14 days</option>
+                                <option value="30">30 days</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin_notes">Message to Customer</label>
+                            <textarea id="admin_notes" name="admin_notes" class="form-control" rows="3"
+                                      placeholder="Any notes or conditions for this quote..."></textarea>
+                        </div>
+                        
+                        <div class="quote-preview">
+                            <h4>Quote Preview</h4>
+                            <div class="preview-row">
+                                <span>Quoted Price:</span>
+                                <span id="preview-price">UGX 0</span>
+                            </div>
+                            <div class="preview-row discount">
+                                <span>Discount:</span>
+                                <span id="preview-discount">- UGX 0</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>Delivery:</span>
+                                <span id="preview-delivery">UGX 0</span>
+                            </div>
+                            <div class="preview-row total">
+                                <span>Total:</span>
+                                <span id="preview-total">UGX 0</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-paper-plane"></i> Send Quote to Customer
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="quote-details-card">
+                    <h3><i class="fas fa-receipt"></i> Quote Details</h3>
+                    
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Quoted Price:</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.quoted_price or 0) }}</span>
+                        </div>
+                        {% if quote.discount_applied > 0 %}
+                        <div class="price-row discount">
+                            <span>Discount:</span>
+                            <span>- UGX {{ "{:,.0f}".format(quote.discount_applied) }}</span>
+                        </div>
+                        {% endif %}
+                        {% if quote.delivery_fee > 0 %}
+                        <div class="price-row">
+                            <span>Delivery:</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.delivery_fee) }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="price-row total">
+                            <span>Total:</span>
+                            <span>UGX {{ "{:,.0f}".format(quote.total_price or 0) }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if quote.admin_notes %}
+                    <div class="admin-notes-display">
+                        <h4>Your Message:</h4>
+                        <p>{{ quote.admin_notes }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if quote.valid_until %}
+                    <div class="valid-until">
+                        Valid until: {{ quote.valid_until.strftime('%b %d, %Y') }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if quote.status == 'Converted' and quote.order_id %}
+                    <a href="{{ url_for('admin_order_detail', order_id=quote.order_id) }}" class="btn btn-primary btn-block">
+                        <i class="fas fa-box"></i> View Order #{{ quote.order_id }}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <a href="https://wa.me/{{ quote.user.phone|replace('+', '')|replace(' ', '') if quote.user.phone else '256787984135' }}?text=Hi%20{{ quote.user.name }},%20regarding%20your%20Quote%20%23{{ quote.id }}..." 
+                       target="_blank" class="btn btn-whatsapp btn-block">
+                        <i class="fab fa-whatsapp"></i> WhatsApp Customer
+                    </a>
+                    <a href="mailto:{{ quote.user.email }}?subject=Quote%20%23{{ quote.id }}%20-%20Motion" class="btn btn-outline btn-block">
+                        <i class="fas fa-envelope"></i> Email Customer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-hero {
+        background: var(--primary-color);
+        color: white;
+        padding: 100px 0 40px;
+    }
+    
+    .breadcrumb {
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .breadcrumb span {
+        margin: 0 10px;
+        color: rgba(255,255,255,0.4);
+    }
+    
+    .admin-hero h1 {
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .quote-layout {
+        display: grid;
+        grid-template-columns: 1fr 450px;
+        gap: 40px;
+        align-items: start;
+    }
+    
+    @media (max-width: 1200px) {
+        .quote-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    
+    .info-card h3 {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--light-bg);
+        font-size: 1.2rem;
+    }
+    
+    .info-card h3 i {
+        margin-right: 10px;
+        color: var(--secondary-color);
+    }
+    
+    .customer-details .detail-row {
+        display: flex;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .customer-details .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-row .label {
+        width: 130px;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+    
+    .detail-row .value {
+        flex: 1;
+    }
+    
+    .tier-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .tier-new { background: #e2e3e5; color: #383d41; }
+    .tier-bronze { background: #cd7f32; color: white; }
+    .tier-silver { background: #c0c0c0; color: #333; }
+    .tier-gold { background: #ffd700; color: #333; }
+    .tier-vip { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    
+    .quote-item {
+        background: var(--light-bg);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .item-header h4 {
+        margin: 0;
+        font-size: 1rem;
+    }
+    
+    .item-qty {
+        font-weight: 700;
+        color: var(--secondary-color);
+    }
+    
+    .item-specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .item-specs span {
+        background: white;
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 0.85rem;
+    }
+    
+    .item-specs i {
+        margin-right: 5px;
+        color: var(--secondary-color);
+    }
+    
+    .design-file {
+        margin: 15px 0;
+    }
+    
+    .design-notes {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        background: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 10px;
+    }
+    
+    .item-base {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 10px;
+        text-align: right;
+    }
+    
+    .customer-notes {
+        background: #fff3cd;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    
+    .customer-notes h4 {
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+    }
+    
+    .customer-notes p {
+        margin: 0;
+    }
+    
+    .status-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+    
+    .status-header {
+        background: var(--light-bg);
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .status-badge {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pending { background: #ffc107; color: #212529; }
+    .status-quoted { background: #17a2b8; color: white; }
+    .status-converted { background: #28a745; color: white; }
+    .status-rejected { background: #dc3545; color: white; }
+    
+    .status-dates {
+        padding: 15px 20px;
+        font-size: 0.85rem;
+    }
+    
+    .status-dates p {
+        margin: 5px 0;
+    }
+    
+    .quote-form-card, .quote-details-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    
+    .quote-form-card h3, .quote-details-card h3 {
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+    }
+    
+    .quote-form-card h3 i, .quote-details-card h3 i {
+        margin-right: 10px;
+        color: var(--secondary-color);
+    }
+    
+    .suggested-price {
+        background: var(--light-bg);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .suggested-price .amount {
+        font-weight: 700;
+        color: var(--secondary-color);
+        font-size: 1.1rem;
+    }
+    
+    .form-group small {
+        display: block;
+        margin-top: 5px;
+        color: var(--text-light);
+    }
+    
+    .quote-preview {
+        background: var(--primary-color);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 25px 0;
+    }
+    
+    .quote-preview h4 {
+        color: white;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+    }
+    
+    .preview-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.9rem;
+    }
+    
+    .preview-row.discount {
+        color: #90EE90;
+    }
+    
+    .preview-row.total {
+        border-top: 1px solid rgba(255,255,255,0.2);
+        margin-top: 10px;
+        padding-top: 15px;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .price-breakdown {
+        margin-bottom: 20px;
+    }
+    
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .price-row:last-child {
+        border-bottom: none;
+    }
+    
+    .price-row.discount {
+        color: #28a745;
+    }
+    
+    .price-row.total {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--secondary-color);
+    }
+    
+    .admin-notes-display {
+        background: var(--light-bg);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .admin-notes-display h4 {
+        font-size: 0.85rem;
+        margin-bottom: 8px;
+    }
+    
+    .admin-notes-display p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    .valid-until {
+        text-align: center;
+        padding: 10px;
+        background: #fff3cd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .quick-actions {
+        margin-top: 25px;
+    }
+    
+    .quick-actions .btn {
+        margin-bottom: 10px;
+    }
+    
+    .btn-whatsapp {
+        background: #25D366;
+        color: white;
+    }
+    
+    .btn-whatsapp:hover {
+        background: #20bd5a;
+        color: white;
+    }
+    
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live preview calculation
+    function updatePreview() {
+        const price = parseFloat(document.getElementById('quoted_price').value) || 0;
+        const discount = parseFloat(document.getElementById('discount_applied').value) || 0;
+        const delivery = parseFloat(document.getElementById('delivery_fee').value) || 0;
+        const total = price - discount + delivery;
+        
+        document.getElementById('preview-price').textContent = 'UGX ' + price.toLocaleString();
+        document.getElementById('preview-discount').textContent = '- UGX ' + discount.toLocaleString();
+        document.getElementById('preview-delivery').textContent = 'UGX ' + delivery.toLocaleString();
+        document.getElementById('preview-total').textContent = 'UGX ' + total.toLocaleString();
+    }
+    
+    document.getElementById('quoted_price')?.addEventListener('input', updatePreview);
+    document.getElementById('discount_applied')?.addEventListener('input', updatePreview);
+    document.getElementById('delivery_fee')?.addEventListener('input', updatePreview);
+    
+    // Initial preview
+    updatePreview();
+</script>
+{% endblock %}
+

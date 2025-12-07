@@ -13,25 +13,37 @@
             
             <form method="POST" action="{{ url_for('register') }}">
                 <div class="form-group">
-                    <label for="name">Full Name</label>
+                    <label for="name">Full Name *</label>
                     <input type="text" id="name" name="name" class="form-control" 
                            placeholder="John Doe" value="{{ name or '' }}" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="email">Email Address</label>
+                    <label for="email">Email Address *</label>
                     <input type="email" id="email" name="email" class="form-control" 
                            placeholder="your@email.com" value="{{ email or '' }}" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="password">Password</label>
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" 
+                           placeholder="0700000000" value="{{ phone or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="company">Company/Business Name</label>
+                    <input type="text" id="company" name="company" class="form-control" 
+                           placeholder="Optional" value="{{ company or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password *</label>
                     <input type="password" id="password" name="password" class="form-control" 
                            placeholder="Min. 6 characters" required minlength="6">
                 </div>
                 
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password</label>
+                    <label for="confirm_password">Confirm Password *</label>
                     <input type="password" id="confirm_password" name="confirm_password" class="form-control" 
                            placeholder="Repeat password" required minlength="6">
                 </div>
